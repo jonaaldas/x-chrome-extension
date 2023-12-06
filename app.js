@@ -1,3 +1,5 @@
+const backendUrl = 'https://x-chrome-extension.onrender.com/';
+// const backendUrl = 'http://localhost:3050';
 document.addEventListener('DOMContentLoaded', function () {
     const textArea = document.getElementById('textarea');
     const sendTweetBtn = document.getElementById('submitButton');
@@ -18,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     sendTweetBtn.addEventListener('click', async function (e) {
         e.preventDefault();
-        const response = await fetch('http://localhost:3050/api/tweet', {
+        const response = await fetch(`${backendUrl}/api/tweet`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -39,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         const email = emailRegisterInput.value;
         const password = passwordRegisterInput.value;
-        const response = await fetch('http://localhost:3050/api/register', {
+        const response = await fetch(`${backendUrl}/api/register`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -61,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const email = emailInput.value;
         const password = passwordInput.value;
 
-        const response = await fetch('http://localhost:3050/api/login', {
+        const response = await fetch(`${backendUrl}/api/login`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -83,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     logOutBtn.addEventListener('click', async () => {
-        const response = await fetch('http://localhost:3050/api/logout', {
+        const response = await fetch(`${backendUrl}/api/logout`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -176,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 async function getApiKeysFromDatabase(userId) {
-    const response = await fetch('http://localhost:3050/api/keys', {
+    const response = await fetch(`${backendUrl}/api/keys`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
