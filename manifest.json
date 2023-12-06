@@ -1,0 +1,21 @@
+{
+    "name": "Twitter publish ASAP",
+    "version": "1.0",
+    "manifest_version": 3,
+    "description": "Publishes a tweet as soon as possible",
+    "action": {
+        "default_icon": "tweet.png",
+        "default_popup": "popup.html",
+        "default_title": "Click to view a popup"
+    },
+
+    "commands": {
+        "open-popup": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+8",
+                "mac": "Command+Shift+8"
+            },
+            "description": "Open the extension popup"
+        }
+    }
+}
