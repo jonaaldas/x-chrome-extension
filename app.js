@@ -1,4 +1,4 @@
-const backendUrl = 'https://x-chrome-extension.onrender.com/';
+const backendUrl = 'https://x-chrome-extension.onrender.com';
 // const backendUrl = 'http://localhost:3050';
 document.addEventListener('DOMContentLoaded', function () {
     const textArea = document.getElementById('textarea');
@@ -13,6 +13,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const registerLink = document.getElementById('registerLink');
     const saveSettingsBtn = document.querySelector('.saveSettings');
     let tweetText = null;
+
+    if (textArea) {
+        textArea.focus();
+    }
 
     textArea.addEventListener('input', function (e) {
         tweetText = e.target.value;

@@ -3,6 +3,7 @@
     "version": "1.0",
     "manifest_version": 3,
     "description": "Publishes a tweet as soon as possible",
+    "permissions": ["commands"],
     "action": {
         "default_icon": "tweet.png",
         "default_popup": "popup.html",
@@ -10,12 +11,11 @@
     },
 
     "commands": {
-        "open-popup": {
+        "_execute_action": {
             "suggested_key": {
-                "default": "Ctrl+Shift+8",
-                "mac": "Command+Shift+8"
-            },
-            "description": "Open the extension popup"
+                "default": "Ctrl+U",
+                "mac": "Command+U"
+            }
         }
     }
 }
