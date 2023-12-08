@@ -9,7 +9,6 @@
         "default_popup": "popup.html",
         "default_title": "Click to view a popup"
     },
-
     "commands": {
         "_execute_action": {
             "suggested_key": {

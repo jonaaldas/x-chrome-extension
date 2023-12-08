@@ -198,9 +198,6 @@ async function getApiKeysFromDatabase(token) {
 
 // test api keys
 async function testApiKeys(keys) {
-    // make dummy request to API to verify keys
-    // const apiKeys = await getApiKeysFromDatabase(obj.token);
-
     if (!keys) {
         return {success: false, message: 'Error getting api keys132'};
     }
@@ -214,7 +211,7 @@ async function testApiKeys(keys) {
 
     try {
         const response = await twitterClient.v2.me();
-        console.log('🚀 ~ file: backend.js:216 ~ testApiKeys ~ response:', response);
+        console.log('🚀 ~ file: backend.js:214 ~ testApiKeys ~ response:', response);
 
         if (response?.data) {
             return {success: true, message: 'Saved successfully'};

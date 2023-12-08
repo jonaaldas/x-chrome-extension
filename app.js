@@ -1,5 +1,7 @@
-const backendUrl = 'https://x-chrome-extension.onrender.com';
+// const backendUrl = 'https://x-chrome-extension.onrender.com';
+const backendUrl = 'https://presidential-filide-aldas.koyeb.app';
 // const backendUrl = 'http://localhost:3050';
+
 document.addEventListener('DOMContentLoaded', function () {
     const textArea = document.getElementById('textarea');
     const sendTweetBtn = document.getElementById('submitButton');
@@ -38,6 +40,29 @@ document.addEventListener('DOMContentLoaded', function () {
             textArea.value = '';
         } else if (data.success === false) {
             showFlashMessage(data.message);
+        }
+    });
+
+    // Event listener for the textarea to listen for key presses
+    textArea.addEventListener('keypress', async function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault(); // Prevent the default action to stop from newline being entered
+            const response = await fetch(`${backendUrl}/api/tweet`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({text: tweetText, token: localStorage.getItem('userToken')}),
+            });
+            const data = await response.json();
+            if (data.success) {
+                showFlashMessage(data.message);
+                textArea.value = '';
+            } else if (data.success === false) {
+                showFlashMessage(data.message);
+            }
+            textArea.value = ''; // Optionally clear the textarea
         }
     });
 
@@ -119,7 +144,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function setToken(response) {
-        console.log('🚀 ~ file: app.js:116 ~ setToken ~ response:', response);
         localStorage.setItem('userId', response.user.id);
         localStorage.setItem('refreshToken', response.session.refresh_token);
         localStorage.setItem('userToken', response.session.access_token);
@@ -171,7 +195,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 originalApiKeys[key] = data[0][key]; // Store the original value
             }
         } else {
-            showFlashMessage('Error getting api keys');
+            showFlashMessage('You have no API KEYS saved');
+            toggleView(settingsView, mainView);
         }
     });
 
@@ -207,7 +232,7 @@ async function saveSettings(apiInputs, originalApiKeys) {
     const userId = localStorage.getItem('userId');
 
     if (userId === undefined) {
-        showFlashMessage('Error getting user');
+        showFlashMessage('Error getting user, please log in and log out again 😁');
         return;
     }
 
@@ -244,13 +269,9 @@ async function saveSettings(apiInputs, originalApiKeys) {
     const data = await response.json();
 
     if (data.success) {
-        Object.values(apiInputs).forEach((input, index) => {
-            input.setAttribute('disabled', 'disabled');
-            input.type = 'password';
-        });
         showFlashMessage(data.message);
     } else if (!data.success) {
-        showFlashMessage(data.message);
+        showFlashMessage(data.message + ' Wrong API keys');
     }
 }
 
