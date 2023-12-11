@@ -26,7 +26,9 @@
         "twitter-api-v2": "^1.15.2"
     },
     "devDependencies": {
+        "autoprefixer": "^10.4.16",
         "nodemon": "^3.0.1",
-        "tailwindcss": "^3.3.5"
+        "postcss": "^8.4.32",
+        "tailwindcss": "^3.3.6"
     }
 }
