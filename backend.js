@@ -118,10 +118,13 @@ router.post('/api/tweet', async ctx => {
 // fetch user
 router.put('/api/user', async ctx => {
 	const {token} = ctx.request.body;
+	if (!token) {
+		return;
+	}
 	try {
 		const {data: user} = await supabase.auth.getUser(token);
 		const id = user.user.id;
-		ctx.body = user;
+		ctx.body = {success: true, data: user};
 	} catch (error) {
 		console.log(error);
 		ctx.body = {error};
@@ -175,9 +178,28 @@ router.put('/api/keys', async ctx => {
 	}
 });
 
+// get username from twitter
+
+router.put('/api/username', async ctx => {
+	const {token} = ctx.request.body;
+	const keys = await getApiKeysFromDatabase(token);
+
+	if (!keys) {
+		ctx.body = {success: false, message: 'Error getting api keys'};
+		return;
+	}
+	const res = await testApiKeys(keys);
+
+	if (!res.success) {
+		ctx.body = {success: false, message: 'Error getting username'};
+		return;
+	}
+
+	ctx.body = res;
+});
+
 async function getApiKeysFromDatabase(token) {
 	const {data: user, error: getUserError} = await supabase.auth.getUser(token);
-	console.log('🚀 ~ file: backend.js:178 ~ getApiKeysFromDatabase ~ user:', user);
 
 	if (user.user === null) {
 		return;
@@ -207,10 +229,9 @@ async function testApiKeys(keys) {
 
 	try {
 		const response = await twitterClient.v2.me();
-		console.log('🚀 ~ file: backend.js:214 ~ testApiKeys ~ response:', response);
 
 		if (response?.data) {
-			return {success: true, message: 'Saved successfully'};
+			return {success: true, message: 'Saved successfully', data: response};
 		}
 	} catch (e) {
 		console.error('Error saving settings12:', e);
