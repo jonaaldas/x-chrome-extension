@@ -130,9 +130,10 @@
 				this.tab = tab;
 			},
 			async logout() {
-				const res = await axios.post(`${serverURL}api/logout`);
-				if (res.data.success) {
-					localStorage.clear();
+				const {error} = await this.$supabase.auth.signOut();
+				if (error) {
+					console.log(error);
+				} else {
 					this.$router.push('/login');
 				}
 			}

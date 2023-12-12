@@ -81,8 +81,7 @@
 		},
 		methods: {
 			async register() {
-				const res = await axios.post(`${serverURL}api/register`, this.user);
-				console.log(res);
+				let {data, error} = await this.$supabase.auth.signUp(this.user);
 			}
 		}
 	};

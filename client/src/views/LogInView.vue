@@ -53,6 +53,7 @@
 <script>
 	import axios from 'axios';
 	const serverURL = import.meta.env.VITE_SERVER_URL;
+
 	export default {
 		data() {
 			return {
@@ -65,20 +66,26 @@
 		},
 		methods: {
 			async login() {
-				const {data} = await axios.post(`${serverURL}api/login`, this.user);
+				// const {data} = await axios.post(`${serverURL}api/login`, this.user);
 
-				console.log('🚀 ~ file: LogInView.vue:70 ~ login ~ data:', data.data);
-				if (data.success) {
-					let saveInStorage = {
-						access_token: data.data.session.access_token,
-						refresh_token: data.data.session.refresh_token,
-						user: data.data.user.id
-					};
-					this.saveToken(saveInStorage);
-					this.$router.push({name: 'DashboardView'});
-				} else {
-					alert(res.data.message);
-				}
+				// console.log('🚀 ~ file: LogInView.vue:70 ~ login ~ data:', data.data);
+				// if (data.success) {
+				// 	let saveInStorage = {
+				// 		access_token: data.data.session.access_token,
+				// 		refresh_token: data.data.session.refresh_token,
+				// 		user: data.data.user.id
+				// 	};
+				// 	this.saveToken(saveInStorage);
+				// 	this.$router.push({name: 'DashboardView'});
+				// } else {
+				// 	alert(res.data.message);
+				// }
+				const {data, error} = await this.$supabase.auth.signInWithPassword({
+					email: this.user.email,
+					password: this.user.password
+				});
+				console.log('🚀 ~ file: LogInView.vue:84 ~ login ~ error:', error);
+				console.log('🚀 ~ file: LogInView.vue:87 ~ login ~ data:', data);
 			},
 			saveToken(token) {
 				for (let key in token) {
@@ -89,68 +96,3 @@
 	};
 </script>
 <style lang=""></style>
-
-<!-- session
-: 
-access_token
-: 
-"eyJhbGciOiJIUzI1NiIsImtpZCI6IjAyNVkvMUxRMjBOSVZVVlUiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzAyODQ1NDM0LCJpYXQiOjE3MDIyNDA2MzQsImlzcyI6Imh0dHBzOi8vemVuZ2l0bGdkcGt6Z2VnYmZ0a24uc3VwYWJhc2UuY28vYXV0aC92MSIsInN1YiI6IjAyYTcwMjdlLTEzYjctNDQzYy04ZGU5LTQ4ZTlkNTAzNTU1NyIsImVtYWlsIjoibWVAam9uYXRoYW5hbGRhcy5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7fSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTcwMjI0MDYzNH1dLCJzZXNzaW9uX2lkIjoiNTZjZmJkMTgtYjhiMy00YzVjLWI1OGItZGEzZDhhM2JmM2Q4In0.AnjH1FeEzsoogERy8XM1fGnUmetIrAwb_rdGg57UHGI"
-expires_at
-: 
-1702845434
-expires_in
-: 
-604800
-refresh_token
-: 
-"P7JH_lavImh83aK11bAVCQ"
-token_type
-: 
-"bearer"
-user
-: 
-{id: '02a7027e-13b7-443c-8de9-48e9d5035557', aud: 'authenticated', role: 'authenticated', email: 'me@jonathanaldas.com', email_confirmed_at: '2023-11-30T01:24:53.674315Z', …}
-[[Prototype]]
-: 
-Object
-user
-: 
-app_metadata
-: 
-{provider: 'email', providers: Array(1)}
-aud
-: 
-"authenticated"
-confirmed_at
-: 
-"2023-11-30T01:24:53.674315Z"
-created_at
-: 
-"2023-11-30T01:24:53.671695Z"
-email
-: 
-"me@jonathanaldas.com"
-email_confirmed_at
-: 
-"2023-11-30T01:24:53.674315Z"
-id
-: 
-"02a7027e-13b7-443c-8de9-48e9d5035557"
-identities
-: 
-[{…}]
-last_sign_in_at
-: 
-"2023-12-10T20:37:14.306592517Z"
-phone
-: 
-""
-role
-: 
-"authenticated"
-updated_at
-: 
-"2023-12-10T20:37:14.308051Z"
-user_metadata
-: 
-{} -->
