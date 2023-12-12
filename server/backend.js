@@ -5,6 +5,7 @@ import bodyParser from 'koa-bodyparser';
 import {TwitterApi} from 'twitter-api-v2';
 import {createClient} from '@supabase/supabase-js';
 import 'dotenv/config';
+import jsonwebtoken from 'jsonwebtoken';
 
 // Initialize Koa app and Router
 const app = new Koa();
@@ -14,6 +15,8 @@ const router = new Router();
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 const SUPABASE_KEY_ANON = process.env.SUPABASE_KEY_ANON;
+const SUPABASE_JWT_SECRET = process.env.SUPABASE_JWT_SECRET;
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
 	auth: {
 		autoRefreshToken: false,
@@ -23,65 +26,30 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
 });
 const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_KEY_ANON);
 
+// middleware
+
+async function verifyJWT(ctx, next) {
+	const token = ctx.headers.authorization?.split('Bearer ')[1];
+
+	if (!token) {
+		ctx.status = 401;
+		ctx.body = {error: 'No token provided'};
+		return;
+	}
+
+	try {
+		// Verify token
+		ctx.state.user = jsonwebtoken.verify(token, SUPABASE_JWT_SECRET);
+		await next();
+	} catch (error) {
+		ctx.status = 401;
+		ctx.body = {error: 'Invalid token'};
+	}
+}
+
 app.use(cors());
 app.use(bodyParser());
 app.use(router.routes()).use(router.allowedMethods());
-
-router.post('/api/register', async ctx => {
-	const {email, password} = ctx.request.body;
-	if (!email || !password) {
-		ctx.body = {success: false, message: 'Missing email or password'};
-		return;
-	}
-
-	try {
-		const {data, error} = await supabaseAdmin.auth.admin.createUser({
-			email,
-			password,
-			email_confirm: true
-		});
-		ctx.body = {success: true};
-	} catch (error) {
-		console.log(error);
-		ctx.body = {error};
-	}
-});
-
-router.post('/api/login', async ctx => {
-	const {email, password} = ctx.request.body;
-	if (!email || !password) {
-		ctx.body = {success: false, message: 'Missing email or password'};
-		return;
-	}
-
-	try {
-		const {data, error} = await supabase.auth.signInWithPassword({
-			email,
-			password
-		});
-
-		if (error === null) {
-			ctx.body = {success: true, data};
-		} else {
-			ctx.body = {error};
-		}
-	} catch (error) {
-		console.log(error);
-		ctx.body = {error};
-	}
-});
-
-// logout
-
-router.post('/api/logout', async ctx => {
-	try {
-		const res = await supabase.auth.signOut();
-		ctx.body = {success: true, message: 'Logged out'};
-	} catch (error) {
-		console.log(error);
-		ctx.body = {success: data, message: 'Error logging out'};
-	}
-});
 
 router.post('/api/tweet', async ctx => {
 	const {text, token} = ctx.request.body;
@@ -113,6 +81,10 @@ router.post('/api/tweet', async ctx => {
 		console.error('Error sending tweet:', e);
 		ctx.body = {success: false, message: e?.data?.detail || 'Error sending tweet'};
 	}
+});
+
+router.get('/api/test', verifyJWT, async ctx => {
+	console.log('I am running');
 });
 
 // fetch user
