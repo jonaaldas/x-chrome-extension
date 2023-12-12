@@ -6,10 +6,11 @@ import './assets/index.css';
 import Toast from 'vue-toastification';
 import 'vue-toastification/dist/index.css';
 
+import http from './httpService';
+
 import {createClient} from '@supabase/supabase-js';
 
 const options = {
-	// You can set your default options here
 	position: 'bottom-right',
 	timeout: 3048,
 	closeOnClick: true,
@@ -24,7 +25,6 @@ const options = {
 	rtl: false
 };
 
-// Initialize Supabase client
 const supabase = createClient(import.meta.env.VITE_SUPABASE_CLIENT_URL, import.meta.env.VITE_SUPABASE_CLIENT_ANON_KEY);
 
 const app = createApp(App);
@@ -34,5 +34,6 @@ app.use(router);
 app.use(Toast, options);
 
 app.config.globalProperties.$supabase = supabase;
+app.config.globalProperties.$http = http;
 
 app.mount('#app');

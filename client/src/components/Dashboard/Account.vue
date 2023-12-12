@@ -45,19 +45,14 @@
 		},
 		methods: {
 			async getAccountData() {
-				try {
-					const {data} = await axios.put(`${serverURL}api/user`, {token: this.token});
-					if (data.success) {
-						this.email = data.data.user.email;
-					}
-				} catch (error) {
-					console.log('🚀 ~ file: Account.vue:38 ~ getAccountData ~ error:', error);
-					toast.error('Error getting account data');
-				}
+				const {
+					data: {user}
+				} = await this.$supabase.auth.getUser();
+				this.email = user.email;
 			},
 			async getTwitterUsername() {
 				try {
-					const {data} = await axios.put(`${serverURL}api/username`, {token: this.token});
+					const {data} = await this.$http.get('api/username');
 					if (data.success) {
 						this.twitterUsername = data.data.data.username;
 					}

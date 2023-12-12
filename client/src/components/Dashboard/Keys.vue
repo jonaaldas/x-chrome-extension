@@ -46,8 +46,6 @@
 	</div>
 </template>
 <script>
-	const serverURL = import.meta.env.VITE_SERVER_URL;
-	import axios from 'axios';
 	import {useToast} from 'vue-toastification';
 	const toast = useToast();
 	export default {
@@ -60,13 +58,12 @@
 					access_secret: ''
 				},
 				loading: false,
-				userId: localStorage.getItem('user') || '',
 				originalApiKeys: null
 			};
 		},
 		methods: {
 			async getKeys(id) {
-				const {data} = await axios.put(`${serverURL}api/keys`, {userId: this.userId});
+				const {data} = await this.$http.get('api/keys');
 				if (data.success) {
 					this.keys = data.data[0];
 					this.originalApiKeys = JSON.parse(JSON.stringify(this.keys));
@@ -79,35 +76,28 @@
 					access_token: '',
 					access_secret: ''
 				};
-				if (this.userId) {
-					// Check if any input value has changed
-					let hasChanged = false;
-					for (const key in this.keys) {
-						if (this.keys[key] !== this.originalApiKeys[key]) {
-							hasChanged = true;
-							break;
-						}
-					}
 
-					if (!hasChanged) {
-						toast.info('No changes to save');
-						return;
+				let hasChanged = false;
+				for (const key in this.keys) {
+					if (this.keys[key] !== this.originalApiKeys[key]) {
+						hasChanged = true;
+						break;
 					}
+				}
 
-					const {data} = await axios.post(`${serverURL}api/save`, {userId: this.userId, apiKeys: this.keys});
+				if (!hasChanged) {
+					toast.info('No changes to save');
+					return;
+				}
 
-					console.log('🚀 ~ file: Keys.vue:97 ~ saveKeys ~ data:', data);
-					console.log('🚀 ~ file: Keys.vue:97 ~ saveKeys ~ data:12312');
-					if (data.success) {
-						originalApiKeys = this.keys;
-						console.log('🚀 ~ file: Keys.vue:102 ~ saveKeys ~ originalApiKeys:', originalApiKeys);
-						toast.success('Keys saved successfully');
-					} else {
-						toast.error(data.message);
-					}
+				const {data} = await this.$http.post('api/save', {apiKeys: this.keys});
+
+				if (data.success) {
+					originalApiKeys = this.keys;
+					console.log('🚀 ~ file: Keys.vue:102 ~ saveKeys ~ originalApiKeys:', originalApiKeys);
+					toast.success('Keys saved successfully');
 				} else {
-					toast.error('Please login to save keys');
-					this.$router.push('/login');
+					toast.error(data.message);
 				}
 			}
 		},

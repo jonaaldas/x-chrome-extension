@@ -39,7 +39,10 @@ async function verifyJWT(ctx, next) {
 
 	try {
 		// Verify token
+		const decoded = jsonwebtoken.verify(token, SUPABASE_JWT_SECRET);
+		// Assuming the user ID is in the 'sub' claim
 		ctx.state.user = jsonwebtoken.verify(token, SUPABASE_JWT_SECRET);
+		ctx.state.userId = decoded.sub;
 		await next();
 	} catch (error) {
 		ctx.status = 401;
@@ -85,32 +88,17 @@ router.post('/api/tweet', verifyJWT, async ctx => {
 
 router.get('/api/test', verifyJWT, async ctx => {
 	console.log('I am running');
-});
-
-// fetch user
-router.put('/api/user', verifyJWT, async ctx => {
-	const {token} = ctx.request.body;
-	if (!token) {
-		return;
-	}
-	try {
-		const {data: user} = await supabase.auth.getUser(token);
-		const id = user.user.id;
-		ctx.body = {success: true, data: user};
-	} catch (error) {
-		console.log(error);
-		ctx.body = {error};
-	}
+	ctx.body = {success: true};
 });
 
 // save settings
-
 router.post('/api/save', verifyJWT, async ctx => {
 	const obj = ctx.request.body;
+	const userId = await getUserId(ctx);
 
 	const res = await testApiKeys(obj.apiKeys);
 
-	const dataToSave = {...obj.apiKeys, user_id: obj.userId};
+	const dataToSave = {...obj.apiKeys, user_id: userId};
 
 	if (res.success) {
 		const {data, error} = await supabase.from('user_api_keys').insert([dataToSave]).select();
@@ -127,8 +115,8 @@ router.post('/api/save', verifyJWT, async ctx => {
 });
 
 // gets api keys from DB
-router.put('/api/keys', verifyJWT, async ctx => {
-	const {userId} = ctx.request.body;
+router.get('/api/keys', verifyJWT, async ctx => {
+	const userId = await getUserId(ctx);
 
 	if (userId === undefined) {
 		ctx.body = {success: false, message: 'Error getting user'};
@@ -151,9 +139,8 @@ router.put('/api/keys', verifyJWT, async ctx => {
 });
 
 // get username from twitter
-
-router.put('/api/username', verifyJWT, async ctx => {
-	const {token} = ctx.request.body;
+router.get('/api/username', verifyJWT, async ctx => {
+	const token = ctx.headers.authorization?.split('Bearer ')[1];
 	const keys = await getApiKeysFromDatabase(token);
 
 	if (!keys) {
@@ -171,7 +158,7 @@ router.put('/api/username', verifyJWT, async ctx => {
 });
 
 async function getApiKeysFromDatabase(token) {
-	const {data: user, error: getUserError} = await supabase.auth.getUser(token);
+	const {data: user, error} = await supabase.auth.getUser(token);
 
 	if (user.user === null) {
 		return;
@@ -209,6 +196,14 @@ async function testApiKeys(keys) {
 		console.error('Error saving settings12:', e);
 		return {success: false, message: e?.data?.detail || 'Error saving settings'};
 	}
+}
+
+async function getUserId(ctx) {
+	const token = ctx.headers.authorization?.split('Bearer ')[1];
+	const {
+		data: {user}
+	} = await supabase.auth.getUser(token);
+	return user.id;
 }
 
 const port = process.env.PORT || 3050;

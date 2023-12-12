@@ -52,7 +52,6 @@ const getUser = async next => {
 router.beforeEach((to, from, next) => {
 	if (to.meta.requiresAuth) {
 		getUser(next);
-		console.log('Requires Auth');
 	} else {
 		next();
 	}
