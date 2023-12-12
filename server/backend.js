@@ -51,7 +51,7 @@ app.use(cors());
 app.use(bodyParser());
 app.use(router.routes()).use(router.allowedMethods());
 
-router.post('/api/tweet', async ctx => {
+router.post('/api/tweet', verifyJWT, async ctx => {
 	const {text, token} = ctx.request.body;
 
 	if (!text || !token) {
@@ -88,7 +88,7 @@ router.get('/api/test', verifyJWT, async ctx => {
 });
 
 // fetch user
-router.put('/api/user', async ctx => {
+router.put('/api/user', verifyJWT, async ctx => {
 	const {token} = ctx.request.body;
 	if (!token) {
 		return;
@@ -105,7 +105,7 @@ router.put('/api/user', async ctx => {
 
 // save settings
 
-router.post('/api/save', async ctx => {
+router.post('/api/save', verifyJWT, async ctx => {
 	const obj = ctx.request.body;
 
 	const res = await testApiKeys(obj.apiKeys);
@@ -127,7 +127,7 @@ router.post('/api/save', async ctx => {
 });
 
 // gets api keys from DB
-router.put('/api/keys', async ctx => {
+router.put('/api/keys', verifyJWT, async ctx => {
 	const {userId} = ctx.request.body;
 
 	if (userId === undefined) {
@@ -152,7 +152,7 @@ router.put('/api/keys', async ctx => {
 
 // get username from twitter
 
-router.put('/api/username', async ctx => {
+router.put('/api/username', verifyJWT, async ctx => {
 	const {token} = ctx.request.body;
 	const keys = await getApiKeysFromDatabase(token);
 
