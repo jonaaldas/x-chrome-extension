@@ -52,6 +52,7 @@
 </template>
 <script>
 	import axios from 'axios';
+import { toHandlers } from 'vue';
 	const serverURL = import.meta.env.VITE_SERVER_URL;
 
 	export default {
@@ -66,31 +67,17 @@
 		},
 		methods: {
 			async login() {
-				// const {data} = await axios.post(`${serverURL}api/login`, this.user);
-
-				// console.log('🚀 ~ file: LogInView.vue:70 ~ login ~ data:', data.data);
-				// if (data.success) {
-				// 	let saveInStorage = {
-				// 		access_token: data.data.session.access_token,
-				// 		refresh_token: data.data.session.refresh_token,
-				// 		user: data.data.user.id
-				// 	};
-				// 	this.saveToken(saveInStorage);
-				// 	this.$router.push({name: 'DashboardView'});
-				// } else {
-				// 	alert(res.data.message);
-				// }
 				const {data, error} = await this.$supabase.auth.signInWithPassword({
 					email: this.user.email,
 					password: this.user.password
 				});
+				const token = data.session.access_token
+				this.saveToken(token)
 				console.log('🚀 ~ file: LogInView.vue:84 ~ login ~ error:', error);
-				console.log('🚀 ~ file: LogInView.vue:87 ~ login ~ data:', data);
+				console.log('🚀 ~ file: LogInView.vue:87 ~ login ~ data:', data.session.access_token);
 			},
 			saveToken(token) {
-				for (let key in token) {
-					localStorage.setItem(key, token[key]);
-				}
+				localStorage.setItem('access_token', token);
 			}
 		}
 	};

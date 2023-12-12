@@ -4,6 +4,7 @@ import RegisterView from '../views/RegisterView.vue';
 import LoginView from '../views/LoginView.vue';
 import DashboardView from '../views/DashboardView.vue';
 import {createClient} from '@supabase/supabase-js';
+import Test from '../views/Test.vue';
 const supabase = createClient(import.meta.env.VITE_SUPABASE_CLIENT_URL, import.meta.env.VITE_SUPABASE_CLIENT_ANON_KEY);
 
 const router = createRouter({
@@ -28,6 +29,12 @@ const router = createRouter({
 			path: '/dashboard',
 			name: 'DashboardView',
 			component: DashboardView,
+			meta: {requiresAuth: true}
+		},
+		{
+			path: '/test',
+			name: 'Test',
+			component: Test,
 			meta: {requiresAuth: true}
 		}
 	]

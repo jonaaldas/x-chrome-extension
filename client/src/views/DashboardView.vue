@@ -135,6 +135,7 @@
 					console.log(error);
 				} else {
 					this.$router.push('/login');
+					localStorage.removeItem('access_token');
 				}
 			}
 		}
